@@ -72,7 +72,8 @@ def handle_pull_request(payload):
     if action in ['opened', 'synchronize']:
         task_data = {
             'task_id': f"pr_{pr['number']}_{int(datetime.now().timestamp())}",
-            'type': 'pr_review',
+            # Worker expects tasks of type 'open_pr'
+            'type': 'open_pr',
             'action': action,
             'repo': repo,
             'pr_number': str(pr['number']),
