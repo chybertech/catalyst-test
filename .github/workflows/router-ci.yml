@@ -1,0 +1,51 @@
+name: Router CI
+
+on:
+  push:
+    paths:
+      - 'event_router.py'
+      - 'requirements-router.txt'
+      - '.github/workflows/router-ci.yml'
+  pull_request:
+    paths:
+      - 'event_router.py'
+      - 'requirements-router.txt'
+
+jobs:
+  test-router:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-router.txt
+          pip install pytest requests-mock
+      
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 event_router.py --count --select=E9,F63,F7,F82 --show-source --statistics
+      
+      - name: Test event router
+        run: |
+          python -c "
+          import event_router
+          print('✅ Event router imports successfully')
+          app = event_router.app
+          with app.test_client() as client:
+              response = client.get('/health')
+              print(f'Health check status: {response.status_code}')
+          "
+      
+      - name: Validate Redis connection module
+        run: |
+          python -c "
+          from redis_conn import redis_client
+          print('✅ Redis connection module imports successfully')
+          "
