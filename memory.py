@@ -7,3 +7,7 @@ R = redis.Redis(host=os.getenv("REDIS_HOST"),
 
 def set_value(key, value): R.set(key, json.dumps(value))
 def get_value(key):        v = R.get(key); return json.loads(v) if v else None
+ fastapi-bridge
+
+PY 
+ main
